@@ -9,6 +9,7 @@ import { EChartsOption } from 'echarts';
 })
 
 export class PriceChartComponent implements OnInit {
+
   echartsInstance : any;
   
   ngOnInit(): void {
@@ -43,26 +44,25 @@ export class PriceChartComponent implements OnInit {
     ],
   }; 
 
+  onClick($event: MouseEvent) {
+    console.log($event);
+    const yValue = this.echartsInstance.convertFromPixel({ seriesIndex: 0 }, [0, $event.offsetY])[1];
+    console.log('Clicked y value:', yValue);
+    var opt = this.echartsInstance.getOption();//.series[0].markLine;//.data[0].yAxis = 200;
+   
+    // append data to markline
+    opt.series[0].markLine.data.push({yAxis: yValue, lineStyle: {color:'red'}});
+    
+    
+    this.echartsInstance.setOption(opt);
+  }
+
   onChartClick($event: any) {
     var opt = this.echartsInstance.getOption();//.series[0].markLine;//.data[0].yAxis = 200;
     opt.series[0].markLine.data[0].yAxis = 200;
 
     this.echartsInstance.setOption(opt);
-
-    //console.log(ml);
-
-    /*this.echartsInstance.setOption({
-      series : [{ markLine: {
-        data:[{
-          yAxis:200,
-          lineStyle: {
-            color:'red'
-          }}]
-       } }]
-    });*/
-
-    //console.log($event);
-    }
+  }
 
   
 }
