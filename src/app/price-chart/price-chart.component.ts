@@ -1,7 +1,36 @@
 import { Component, OnInit  } from '@angular/core';
 import { EChartsOption } from 'echarts';
 import { DataService } from '../data.service';
+import {io} from 'socket.io-client';
 
+const socket = io('wss://test.deribit.com/ws/api/v2');
+const message = {
+  method: 'public/subscribe',
+  params: {
+    channels: ['ticker.BTC-PERPETUAL.100ms']
+  },
+  jsonrpc: '2.0',
+  id: 1
+};
+socket.emit('message', message);
+socket.on('message', (data) => {
+  const { method, params } = data;
+
+  if (method === 'subscription') {
+    const { channel, data: tickerData } = params;
+
+    if (channel === 'ticker.BTC-PERPETUAL.100ms') {
+      const formattedData = {
+        timestamp: tickerData.timestamp,
+        price: tickerData.last_price
+      };
+
+      // Call a method on your chart component to update the data
+      //this.chartComponent.updateData(formattedData);
+      console.log(formattedData);
+    }
+  }
+});
 
 @Component({
   selector: 'app-price-chart',
