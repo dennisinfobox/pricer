@@ -4,6 +4,23 @@ import { DataService } from '../data.service';
 import { HttpClient } from '@angular/common/http';
 import * as echarts from 'echarts';
 
+var msg = 
+    {"jsonrpc": "2.0",
+     "method": "public/subscribe",
+     "id": 999,
+     "params": {
+        "channels": ["chart.trades.BTC-PERPETUAL.1"]}
+    };
+/*var ws = new WebSocket('wss://localhost:7111/ws/api/v2');
+ws.onmessage = function (e) {
+    // do something with the notifications...
+    console.log('received from server : ', e.data);
+};
+ws.onopen = function () {
+    ws.send(JSON.stringify(msg));
+};*/
+
+const ws1 = new WebSocket('wss://localhost:7111/ws/api/v2');
 
 @Component({
   selector: 'app-price-chart',
@@ -13,13 +30,21 @@ import * as echarts from 'echarts';
 
 
 export class PriceChartComponent implements OnInit {
-
+  //ws1: WebSocket;
   echartsInstance : any;
   dataSource: DataItem[] = [];
   dataSplitted: any;
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+    
+    ws1.onmessage = this.onTick;
+
+    ws1.onopen = this.onOpen;
+   }
   
   ngOnInit(): void {
+    
+    
+
     this.http.get<any>(
       'https://localhost:7111/api/v2/public/get_tradingview_chart_data?instrument_name=BTC-PERPETUAL&resolution=60&start_timestamp=1665535044204&end_timestamp=1676755044204'
     ).subscribe(data => {
@@ -155,12 +180,22 @@ export class PriceChartComponent implements OnInit {
     this.echartsInstance.setOption(opt);
   }
 
-  onChartClick($event: any) {
+  onChartClick(e: any) {
+    //console.log('received from server 222: ', e.data);
     //var opt = this.echartsInstance.getOption();//.series[0].markLine;//.data[0].yAxis = 200;
     //opt.series[0].markLine.data[0].yAxis = 200;
 
     //this.echartsInstance.setOption(opt);
-  }  
+  }
+
+  onTick(e: any) {
+    // do something with the notifications...
+    console.log('received from server 222: ', e.data);
+  }
+
+  onOpen() {
+    ws1.send(JSON.stringify(msg));    
+  }
 }
 function splitData(rawData: (number | string)[][]) {
   const categoryData = [];
