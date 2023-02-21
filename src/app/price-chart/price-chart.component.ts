@@ -50,7 +50,7 @@ export class PriceChartComponent implements OnInit {
     xAxis: {
       type: 'category',      
       boundaryGap: false,
-      axisLine: { onZero: true },
+      //axisLine: { onZero: true },
       splitLine: { show: true },   
       min: 'dataMin',
       max: 'dataMax',
@@ -114,7 +114,19 @@ export class PriceChartComponent implements OnInit {
 
         this.ws1.onmessage = (e) => {
           this.onTick(e);
-        };    
+        };
+        
+        setInterval(() => {
+          this.onInterval();
+        }, 1000);
+  }
+  onInterval() {    
+    this.echartsInstance.setOption({
+      dataset: {
+        source: this.dataSource
+      }
+    });
+    
   }
 
   onChartInit(ec : any) {
@@ -135,14 +147,7 @@ export class PriceChartComponent implements OnInit {
   }
 
   onData(data: any) {
-    console.log('onData:', data);
-    console.log('this onData: ', this);
-      /*const categoryData = data.result.ticks.map((tick:  number ) => echarts.format.formatTime('yyyy-MM-dd\nhh:mm:ss',new Date(tick))); //.toLocaleTimeString()
-      const values = data.result.open.map((open: any, i: string | number) => [
-        data.result.open[i],
-        data.result.close[i],
-        data.result.low[i],
-        data.result.high[i]]);*/
+   
         const dataArray: DataItem[] = data.result.ticks.map((tick: number, index: number) => [
           echarts.format.formatTime('yyyy-MM-dd\nhh:mm:ss',new Date(tick)), // convert tick to date string
           data.result.open[index],
@@ -150,7 +155,8 @@ export class PriceChartComponent implements OnInit {
           data.result.low[index],
           data.result.high[index],
           data.result.volume[index],
-          data.result.cost[index]
+          data.result.cost[index],
+          tick
         ]);
         this.dataSource = dataArray;
         //var opt = this.echartsInstance.getOption();
@@ -170,36 +176,31 @@ export class PriceChartComponent implements OnInit {
   }
 
   onTick(e: any) {
-    // do something with the notifications...
-    console.log('e: ', e);
-    console.log('received from server 222: ', e.data);
-    console.log('this: ', this);
-
+    
     const data = JSON.parse(e.data);
-    //console.log('zzz: ', data.params.data.tick);
-    // this.mergeOptions 
-    const opts: EChartsOption = {
-      xAxis: {
-        
-        data: [echarts.format.formatTime('yyyy-MM-dd\nhh:mm:ss',new Date(data.params.data.tick))]      
-        
-      },
-      series: [
-        {
-          data: [[
-            data.params.data.open,
-            data.params.data.close,
-            data.params.data.low,
-            data.params.data.high,
-            data.params.data.volume,
-            data.params.data.cost]]
-        }
-      ]
-    };
 
-    //const op = this.echartsInstance.getOption();
+    const dataItem: DataItem = [
+      echarts.format.formatTime('yyyy-MM-dd\nhh:mm:ss',new Date(data.params.data.tick)),
+      data.params.data.open,
+      data.params.data.close,
+      data.params.data.low,
+      data.params.data.high,
+      data.params.data.volume,
+      data.params.data.cost,
+      data.params.data.tick];
+      console.log('dataItem: ', dataItem);
 
-    //this.echartsInstance.setOption(opts, false);
+      // check if dataSource is empty or the new tick value is greater than the last tick value in dataSource
+  if (this.dataSource.length === 0 || dataItem[7] > this.dataSource[this.dataSource.length - 1][7]) {
+    this.dataSource.push(dataItem);  // concatenate the new data
+    console.log('concat ');
+  } else {
+    this.dataSource[this.dataSource.length - 1] = dataItem;  // replace the last element
+    console.log('replace ');
+  }
+
+     // this.dataSource = this.dataSource.concat(dataItem);     
+      
   }
 
   onOpen(event: any) {
@@ -223,7 +224,7 @@ const upColor = '#ec0000';
 const upBorderColor = '#8A0000';
 const downColor = '#00da3c';
 const downBorderColor = '#008F28';
-type DataItem = [string, number, number, number, number, number, number];
+type DataItem = [string, number, number, number, number, number, number, number];
 
 
 // read data above from service
