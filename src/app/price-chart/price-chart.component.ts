@@ -11,16 +11,6 @@ var msg =
      "params": {
         "channels": ["chart.trades.BTC-PERPETUAL.1"]}
     };
-/*var ws = new WebSocket('wss://localhost:7111/ws/api/v2');
-ws.onmessage = function (e) {
-    // do something with the notifications...
-    console.log('received from server : ', e.data);
-};
-ws.onopen = function () {
-    ws.send(JSON.stringify(msg));
-};*/
-
-const ws1 = new WebSocket('wss://localhost:7111/ws/api/v2');
 
 @Component({
   selector: 'app-price-chart',
@@ -30,20 +20,17 @@ const ws1 = new WebSocket('wss://localhost:7111/ws/api/v2');
 
 
 export class PriceChartComponent implements OnInit {
-  //ws1: WebSocket;
   echartsInstance : any;
   dataSource: DataItem[] = [];
   dataSplitted: any;
+  mergeOptions = {};
+  ws1 = new WebSocket('wss://localhost:7111/ws/api/v2');
   constructor(private http: HttpClient) {
     
-    ws1.onmessage = this.onTick;
-
-    ws1.onopen = this.onOpen;
+    
    }
   
-  ngOnInit(): void {
-    
-    
+  ngOnInit(): void { 
 
     this.http.get<any>(
       'https://localhost:7111/api/v2/public/get_tradingview_chart_data?instrument_name=BTC-PERPETUAL&resolution=60&start_timestamp=1665535044204&end_timestamp=1676755044204'
@@ -54,7 +41,7 @@ export class PriceChartComponent implements OnInit {
         data.result.close[i],
         data.result.low[i],
         data.result.high[i]]);
-        const dataArray: DataItem[] = data.result.ticks.map((tick: number, index: number) => [
+        /*const dataArray: DataItem[] = data.result.ticks.map((tick: number, index: number) => [
           echarts.format.formatTime('yyyy-MM-dd\nhh:mm:ss',new Date(tick)), // convert tick to date string
           data.result.open[index],
           data.result.high[index],
@@ -63,10 +50,10 @@ export class PriceChartComponent implements OnInit {
           data.result.volume[index],
           data.result.cost[index]
         ]);
-        this.dataSource = dataArray;
+        this.dataSource = dataArray;*/
         var opt = this.echartsInstance.getOption();
         //opt.dataset.source = this.dataSource;
-        //console.log(opt.dataset.source);
+        //console.log(categoryData);
         
 
         const chartOption2: EChartsOption = {
@@ -142,22 +129,15 @@ export class PriceChartComponent implements OnInit {
           ],
         }; 
 
-        this.echartsInstance.setOption(chartOption2); 
-
-      
-
-      //var opt = this.echartsInstance.getOption();
-      
-      //
-      //opt.series[0].data = values;
-      //opt.xAxis.data = categoryData;
-      //console.log(categoryData);
-      //this.echartsInstance.setOption(opt, true);      
-      
-      //console.log(this.dataSplitted.values);
+        this.echartsInstance.setOption(chartOption2);       
       
     });
-    
+
+        this.ws1.onopen = this.onOpen;
+
+        this.ws1.onmessage = (e) => {
+          this.onTick(e);
+        };    
   }
 
   onChartInit(ec : any) {
@@ -180,21 +160,39 @@ export class PriceChartComponent implements OnInit {
     this.echartsInstance.setOption(opt);
   }
 
-  onChartClick(e: any) {
-    //console.log('received from server 222: ', e.data);
-    //var opt = this.echartsInstance.getOption();//.series[0].markLine;//.data[0].yAxis = 200;
-    //opt.series[0].markLine.data[0].yAxis = 200;
-
-    //this.echartsInstance.setOption(opt);
+  onChartClick(e: any) {    
   }
 
   onTick(e: any) {
     // do something with the notifications...
+    console.log('e: ', e);
     console.log('received from server 222: ', e.data);
+    console.log('this: ', this);
+
+    const data = JSON.parse(e.data);
+    //console.log('zzz: ', data.params.data.tick);
+    // this.mergeOptions 
+    const opts: EChartsOption = {
+      xAxis: {
+        
+        data: [echarts.format.formatTime('yyyy-MM-dd\nhh:mm:ss',new Date(data.params.data.tick))]      
+        
+      },
+      series: [
+        {
+          data: [[data.params.data.open, data.params.data.close, data.params.data.low, data.params.data.high]]
+        }
+      ]
+    };
+
+    //const op = this.echartsInstance.getOption();
+
+    //this.echartsInstance.setOption(opts, false);
   }
 
-  onOpen() {
-    ws1.send(JSON.stringify(msg));    
+  onOpen(event: any) {
+    console.log('onOpen: ', event);
+    event.target.send(JSON.stringify(msg));    
   }
 }
 function splitData(rawData: (number | string)[][]) {
