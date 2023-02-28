@@ -4,13 +4,7 @@ import { DataService } from '../data.service';
 import { HttpClient } from '@angular/common/http';
 import * as echarts from 'echarts';
 
-var msg = 
-    {"jsonrpc": "2.0",
-     "method": "public/subscribe",
-     "id": 999,
-     "params": {
-        "channels": ["chart.trades.BTC-PERPETUAL.1"]}
-    };
+
 
 @Component({
   selector: 'app-price-chart',
@@ -20,6 +14,7 @@ var msg =
 
 
 export class PriceChartComponent implements OnInit {
+  selectedTimeFrame: string = '1min';
   echartsInstance : any;
   dataSource: DataItem[] = [];
   dataSplitted: any;
@@ -100,17 +95,22 @@ export class PriceChartComponent implements OnInit {
     ],
   }
   
-  ngOnInit(): void { 
+  ngOnInit(): void {
+    const interval = this.getInterval();
 
     this.http.get<any>(
-      'https://localhost:7111/api/v2/public/get_tradingview_chart_data?instrument_name=BTC-PERPETUAL&resolution=60&start_timestamp=1665535044204&end_timestamp=1676755044204'
+      `https://localhost:7111/api/v2/public/get_tradingview_chart_data?instrument_name=BTC-PERPETUAL&resolution=${interval}&start_timestamp=1665535044204&end_timestamp=1676755044204`
     ).subscribe(data => {this.onData(data)});
     
     // = (data) => { this.onData(data) };
     
      
 
-        this.ws1.onopen = this.onOpen;
+        //this.ws1.onopen = this.onOpen;
+
+        this.ws1.onopen = (e) => {
+          this.onOpen(e);
+        };
 
         this.ws1.onmessage = (e) => {
           this.onTick(e);
@@ -127,6 +127,30 @@ export class PriceChartComponent implements OnInit {
       }
     });
     
+  }
+
+  changeTimeFrame(timeFrame: string) {
+    this.selectedTimeFrame = timeFrame;
+    let xAxisType;
+    switch (timeFrame) {
+      case '1min':
+        xAxisType = 'time';
+        break;
+      case '5min':
+        xAxisType = 'time';
+        break;
+      case '15min':
+        xAxisType = 'time';
+        break;
+      case '1hr':
+        xAxisType = 'time';
+        break;
+      case '4hr':
+        xAxisType = 'time';
+        break;
+      default:
+        xAxisType = 'time';
+    }
   }
 
   onChartInit(ec : any) {
@@ -204,8 +228,34 @@ export class PriceChartComponent implements OnInit {
   }
 
   onOpen(event: any) {
+    const symbol = "BTC-PERPETUAL";
+  const interval = this.getInterval();
+    const msg = 
+    {"jsonrpc": "2.0",
+     "method": "public/subscribe",
+     "id": 999,
+     "params": {
+        "channels": [`chart.trades.${symbol}.${interval}`]}
+    };
     console.log('onOpen: ', event);
     event.target.send(JSON.stringify(msg));    
+  }
+
+  getInterval() {
+    switch (this.selectedTimeFrame) {
+      case '1min':
+        return 1;
+      case '5min':
+        return 5;
+      case '15min':
+        return 15;
+      case '1hr':
+        return 60;
+      case '4hr':
+        return 240;
+      default:
+        return 1;
+    }
   }
 }
 function splitData(rawData: (number | string)[][]) {
