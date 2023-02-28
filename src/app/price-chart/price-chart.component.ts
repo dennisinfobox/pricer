@@ -15,7 +15,7 @@ export class PriceChartComponent implements OnInit {
     dataSource: DataItem[] = [];
     dataSplitted: any;
     mergeOptions = {};
-    ws1 = new WebSocket('wss://localhost:7111/ws/api/v2');
+    ws1: WebSocket | undefined;
     constructor(private http: HttpClient) {}
 
     chartOption: EChartsOption = {
@@ -80,7 +80,7 @@ export class PriceChartComponent implements OnInit {
                     x: 0,
                     y: [1, 2, 3, 4],
                 },
-                markLine: {
+                /*markLine: {
                     data: [
                         {
                             yAxis: 0.2,
@@ -89,17 +89,26 @@ export class PriceChartComponent implements OnInit {
                             },
                         },
                     ],
-                },
+                },*/
             },
         ],
     };
 
     ngOnInit(): void {
-        const interval = this.getInterval();
+        this.doDataSubscribe();
+    }
+    private doDataSubscribe() {
+        const interval = this.getBarInterval();
         const currentTimestamp: number = Date.now();
-        const minutesAgo: number = 600; // set number of minutes ago
+        const minutesAgo: number = interval * 600; // set number of minutes ago
         const millisecondsAgo: number = minutesAgo * 60 * 1000; // convert minutes to milliseconds
         const timestampStart: number = currentTimestamp - millisecondsAgo; // calculate timestamp 600 minutes ago
+
+        if (this.ws1) {
+            this.ws1.close();
+        }
+
+        this.ws1 = new WebSocket('wss://localhost:7111/ws/api/v2');
 
         this.http
             .get<any>(
@@ -121,6 +130,7 @@ export class PriceChartComponent implements OnInit {
             this.onInterval();
         }, 1000);
     }
+
     onInterval() {
         this.echartsInstance.setOption({
             dataset: {
@@ -131,26 +141,7 @@ export class PriceChartComponent implements OnInit {
 
     changeTimeFrame(timeFrame: string) {
         this.selectedTimeFrame = timeFrame;
-        let xAxisType;
-        switch (timeFrame) {
-            case '1min':
-                xAxisType = 'time';
-                break;
-            case '5min':
-                xAxisType = 'time';
-                break;
-            case '15min':
-                xAxisType = 'time';
-                break;
-            case '1hr':
-                xAxisType = 'time';
-                break;
-            case '4hr':
-                xAxisType = 'time';
-                break;
-            default:
-                xAxisType = 'time';
-        }
+        this.doDataSubscribe();
     }
 
     onChartInit(ec: any) {
@@ -192,9 +183,6 @@ export class PriceChartComponent implements OnInit {
             ]
         );
         this.dataSource = dataArray;
-        //var opt = this.echartsInstance.getOption();
-        //opt.dataset.source = this.dataSource;
-        //console.log(this.dataSource);
 
         this.echartsInstance.setOption({
             dataset: {
@@ -240,7 +228,7 @@ export class PriceChartComponent implements OnInit {
 
     onOpen(event: any) {
         const symbol = 'BTC-PERPETUAL';
-        const interval = this.getInterval();
+        const interval = this.getBarInterval();
         const msg = {
             jsonrpc: '2.0',
             method: 'public/subscribe',
@@ -253,7 +241,7 @@ export class PriceChartComponent implements OnInit {
         event.target.send(JSON.stringify(msg));
     }
 
-    getInterval() {
+    getBarInterval() {
         switch (this.selectedTimeFrame) {
             case '1min':
                 return 1;
