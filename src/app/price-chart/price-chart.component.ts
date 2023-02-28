@@ -96,18 +96,18 @@ export class PriceChartComponent implements OnInit {
 
   ngOnInit(): void {
     const interval = this.getInterval();
+    const currentTimestamp: number = Date.now();
+    const minutesAgo: number = 600; // set number of minutes ago
+    const millisecondsAgo: number = minutesAgo * 60 * 1000; // convert minutes to milliseconds
+    const timestampStart: number = currentTimestamp - millisecondsAgo; // calculate timestamp 600 minutes ago
 
     this.http
       .get<any>(
-        `https://localhost:7111/api/v2/public/get_tradingview_chart_data?instrument_name=BTC-PERPETUAL&resolution=${interval}&start_timestamp=1665535044204&end_timestamp=1676755044204`
+        `https://localhost:7111/api/v2/public/get_tradingview_chart_data?instrument_name=BTC-PERPETUAL&resolution=${interval}&start_timestamp=${timestampStart}&end_timestamp=${currentTimestamp}`
       )
       .subscribe((data) => {
         this.onData(data);
       });
-
-    // = (data) => { this.onData(data) };
-
-    //this.ws1.onopen = this.onOpen;
 
     this.ws1.onopen = (e) => {
       this.onOpen(e);
