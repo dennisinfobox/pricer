@@ -16,6 +16,7 @@ export class PriceChartComponent implements OnInit {
     dataSplitted: any;
     mergeOptions = {};
     ws1: WebSocket | undefined;
+    yCoord: number | undefined;
     constructor(private http: HttpClient) {}
 
     chartOption: EChartsOption = {
@@ -256,6 +257,25 @@ export class PriceChartComponent implements OnInit {
             default:
                 return 1;
         }
+    }
+
+    onContextMenu($event: MouseEvent) {
+        console.log($event);
+        $event.preventDefault();
+        this.yCoord = this.echartsInstance.convertFromPixel(
+            { seriesIndex: 0 },
+            [0, $event.offsetY]
+        )[1];
+    }
+
+    createHorizontalLine() {
+        console.log('yCoord: ', this.yCoord);
+        const opt = this.echartsInstance.getOption();
+        opt.series[0].markLine.data.push({
+            yAxis: this.yCoord,
+            lineStyle: { color: 'blue' },
+        });
+        this.echartsInstance.setOption(opt);
     }
 }
 
