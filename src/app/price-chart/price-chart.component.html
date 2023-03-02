@@ -3,6 +3,6 @@
     <button (click)="changeTimeFrame('5min')" [ngClass]="{'selected': selectedTimeFrame === '5min'}">5min</button>
     <button (click)="changeTimeFrame('15min')" [ngClass]="{'selected': selectedTimeFrame === '15min'}">15min</button>
     <button (click)="changeTimeFrame('1hr')" [ngClass]="{'selected': selectedTimeFrame === '1hr'}">1hr</button>
-    <button (click)="changeTimeFrame('4hr')" [ngClass]="{'selected': selectedTimeFrame === '4hr'}">4hr</button>
+    <button (click)="changeTimeFrame('3hr')" [ngClass]="{'selected': selectedTimeFrame === '3hr'}">3hr</button>
   </div>
 <div echarts [options]="chartOption" (chartClick)="onChartClick($event)" (click)="onClick($event)" (chartInit)="onChartInit($event)" [merge]="mergeOptions" class="demo-chart"></div>

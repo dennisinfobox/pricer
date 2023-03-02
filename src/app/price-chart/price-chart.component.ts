@@ -80,16 +80,16 @@ export class PriceChartComponent implements OnInit {
                     x: 0,
                     y: [1, 2, 3, 4],
                 },
-                /*markLine: {
+                markLine: {
                     data: [
-                        {
+                        /*{
                             yAxis: 0.2,
                             lineStyle: {
                                 color: 'green',
                             },
-                        },
+                        },*/
                     ],
-                },*/
+                },
             },
         ],
     };
@@ -251,8 +251,8 @@ export class PriceChartComponent implements OnInit {
                 return 15;
             case '1hr':
                 return 60;
-            case '4hr':
-                return 240;
+            case '3hr':
+                return 180;
             default:
                 return 1;
         }
