@@ -4,10 +4,12 @@
     <button (click)="changeTimeFrame('15min')" [ngClass]="{'selected': selectedTimeFrame === '15min'}">15min</button>
     <button (click)="changeTimeFrame('1hr')" [ngClass]="{'selected': selectedTimeFrame === '1hr'}">1hr</button>
     <button (click)="changeTimeFrame('3hr')" [ngClass]="{'selected': selectedTimeFrame === '3hr'}">3hr</button>
-  </div>
-  <div [matMenuTriggerFor]="menu" (contextmenu)="onContextMenu($event)">
+</div>  
+<div echarts [options]="chartOption" (chartClick)="onChartClick($event)" (click)="onClick($event)" (chartInit)="onChartInit($event)" [merge]="mergeOptions" class="demo-chart" (contextmenu)="onContextMenu($event)">
+  <div [style.position]="'absolute'" [style.z-index]="9999" [style.top]="contextMenuTop + 'px'" [style.left]="contextMenuLeft + 'px'" [matMenuTriggerFor]="menu">
+    <button mat-button>Right-click for menu</button>
     <mat-menu #menu="matMenu">
       <button mat-menu-item (click)="createHorizontalLine()">Create Horizontal Line</button>
     </mat-menu>
   </div>
-<div echarts [options]="chartOption" (chartClick)="onChartClick($event)" (click)="onClick($event)" (chartInit)="onChartInit($event)" [merge]="mergeOptions" class="demo-chart" (contextmenu)="onContextMenu($event)"></div>
+</div>

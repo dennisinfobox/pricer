@@ -17,6 +17,8 @@ export class PriceChartComponent implements OnInit {
     mergeOptions = {};
     ws1: WebSocket | undefined;
     yCoord: number | undefined;
+    contextMenuTop: any;
+    contextMenuLeft: any;
     constructor(private http: HttpClient) {}
 
     chartOption: EChartsOption = {
@@ -266,6 +268,8 @@ export class PriceChartComponent implements OnInit {
             { seriesIndex: 0 },
             [0, $event.offsetY]
         )[1];
+        this.contextMenuTop = $event.clientY;
+        this.contextMenuLeft = $event.clientX;
     }
 
     createHorizontalLine() {
