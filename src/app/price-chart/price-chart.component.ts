@@ -19,6 +19,7 @@ export class PriceChartComponent implements OnInit {
     yCoord: number | undefined;
     contextMenuTop: any;
     contextMenuLeft: any;
+    contextMenuVisible: boolean = false;
     constructor(private http: HttpClient) {}
 
     chartOption: EChartsOption = {
@@ -268,8 +269,16 @@ export class PriceChartComponent implements OnInit {
             { seriesIndex: 0 },
             [0, $event.offsetY]
         )[1];
-        this.contextMenuTop = $event.clientY;
-        this.contextMenuLeft = $event.clientX;
+
+        // set context menu position based on right-click event
+        this.contextMenuVisible = true;
+        this.contextMenuTop = $event.pageY;
+        this.contextMenuLeft = $event.pageX;
+
+        // close context menu if user clicks outside of it
+        document.addEventListener('click', () => {
+            this.contextMenuVisible = false;
+        });
     }
 
     createHorizontalLine() {
