@@ -7,7 +7,7 @@
 </div>
 
 <div echarts [options]="chartOption" (chartClick)="onChartClick($event)" (click)="onClick($event)"
-  (chartInit)="onChartInit($event)" [merge]="mergeOptions" class="demo-chart" (contextmenu)="onContextMenu($event)">
+  (chartInit)="onChartInit($event)" [merge]="mergeOptions" class="demo-chart" (contextmenu)="onContextMenu($event)" #chartElement>
   <div *ngIf="contextMenuVisible" [style.position]="'absolute'" [style.z-index]="9999" [style.top]="contextMenuTop + 'px'" [style.left]="contextMenuLeft + 'px'" [matMenuTriggerFor]="menu">
     <button mat-button>Right-click for menu</button>
     <mat-menu #menu="matMenu">

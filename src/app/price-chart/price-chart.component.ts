@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { EChartsOption } from 'echarts';
 import { DataService } from '../data.service';
 import { HttpClient } from '@angular/common/http';
@@ -10,6 +10,8 @@ import * as echarts from 'echarts';
     styleUrls: ['./price-chart.component.css'],
 })
 export class PriceChartComponent implements OnInit {
+    @ViewChild('chartElement') chartElement: ElementRef | undefined;
+
     selectedTimeFrame: string = '1min';
     echartsInstance: any;
     dataSource: DataItem[] = [];
@@ -112,11 +114,11 @@ export class PriceChartComponent implements OnInit {
             this.ws1.close();
         }
 
-        this.ws1 = new WebSocket('wss://localhost:7111/ws/api/v2');
+        this.ws1 = new WebSocket('ws://localhost:12346/ws/api/v2');
 
         this.http
             .get<any>(
-                `https://localhost:7111/api/v2/public/get_tradingview_chart_data?instrument_name=BTC-PERPETUAL&resolution=${interval}&start_timestamp=${timestampStart}&end_timestamp=${currentTimestamp}`
+                `http://localhost:12346/api/v2/public/get_tradingview_chart_data?instrument_name=BTC-PERPETUAL&resolution=${interval}&start_timestamp=${timestampStart}&end_timestamp=${currentTimestamp}`
             )
             .subscribe((data) => {
                 this.onData(data);
@@ -263,7 +265,9 @@ export class PriceChartComponent implements OnInit {
     }
 
     onContextMenu($event: MouseEvent) {
-        console.log($event);
+        console.log(this.chartElement);
+        console.log($event.target);
+        //if ($event.target === this.chartElement!.nativeElement) {
         $event.preventDefault();
         this.yCoord = this.echartsInstance.convertFromPixel(
             { seriesIndex: 0 },
@@ -279,6 +283,7 @@ export class PriceChartComponent implements OnInit {
         document.addEventListener('click', () => {
             this.contextMenuVisible = false;
         });
+        //}
     }
 
     createHorizontalLine() {
