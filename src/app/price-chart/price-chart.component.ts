@@ -21,27 +21,10 @@ export class PriceChartComponent implements OnInit {
         { id: 2, name: 'Item 2' },
         { id: 3, name: 'Item 3' },
     ];
-    contextMenuPosition = { x: '0px', y: '0px' };
 
     @ViewChild(MatMenuTrigger)
-    contextMenu: MatMenuTrigger | undefined;
-
-    onContextMenu2(event: MouseEvent, item: Item) {
-        event.preventDefault();
-        this.contextMenuPosition.x = event.clientX + 'px';
-        this.contextMenuPosition.y = event.clientY + 'px';
-        this.contextMenu!.menuData = { item: item };
-        this.contextMenu!.menu!.focusFirstItem('mouse');
-        this.contextMenu!.openMenu();
-    }
-
-    onContextMenuAction1(item: Item) {
-        alert(`Click on Action 1 for ${item.name}`);
-    }
-
-    onContextMenuAction2(item: Item) {
-        alert(`Click on Action 2 for ${item.name}`);
-    }
+    contextMenu!: MatMenuTrigger;
+    contextMenuPosition = { x: '150px', y: '150px' };
 
     selectedTimeFrame: string = '1min';
     echartsInstance: any;
@@ -293,6 +276,25 @@ export class PriceChartComponent implements OnInit {
             default:
                 return 1;
         }
+    }
+
+    onContextMenu2(event: MouseEvent) {
+        event.preventDefault();
+        this.contextMenuPosition.x = event.clientX + 'px';
+        this.contextMenuPosition.y = event.clientY + 'px';
+        console.log('x:', this.contextMenuPosition.x);
+        console.log('y:', this.contextMenuPosition.y);
+        //this.contextMenu!.menuData = { item: item };
+        this.contextMenu!.menu!.focusFirstItem('mouse');
+        this.contextMenu!.openMenu();
+    }
+
+    onContextMenuAction1() {
+        alert(`Click on Action 1 for `);
+    }
+
+    onContextMenuAction2() {
+        alert(`Click on Action 2 for `);
     }
 
     onContextMenu($event: MouseEvent) {

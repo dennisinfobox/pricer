@@ -1,18 +1,6 @@
-<p>Right-click on the items below to show the context menu:</p>
-<mat-list>
-  <mat-list-item *ngFor="let item of items" (contextmenu)="onContextMenu2($event, item)">
-    {{ item.name }}
-  </mat-list-item>
-</mat-list>
-<div style="visibility: hidden; position: fixed" [style.left]="contextMenuPosition.x"
-  [style.top]="contextMenuPosition.y" [matMenuTriggerFor]="contextMenu">
-</div>
-<mat-menu #contextMenu="matMenu">
-  <ng-template matMenuContent let-item="item">
-    <button mat-menu-item (click)="onContextMenuAction1(item)">Action 1</button>
-    <button mat-menu-item (click)="onContextMenuAction2(item)">Action 2</button>
-  </ng-template>
-</mat-menu>
+
+
+
 <div class="chart-buttons">
   <button (click)="changeTimeFrame('1min')" [ngClass]="{'selected': selectedTimeFrame === '1min'}">1min</button>
   <button (click)="changeTimeFrame('5min')" [ngClass]="{'selected': selectedTimeFrame === '5min'}">5min</button>
@@ -21,5 +9,17 @@
   <button (click)="changeTimeFrame('3hr')" [ngClass]="{'selected': selectedTimeFrame === '3hr'}">3hr</button>
 </div>
 
-<div echarts [options]="chartOption" (chartClick)="onChartClick($event)" (click)="onClick($event)"
-  (chartInit)="onChartInit($event)" [merge]="mergeOptions" class="demo-chart"></div>
+<div  echarts [options]="chartOption" (chartClick)="onChartClick($event)" (click)="onClick($event)"
+  (chartInit)="onChartInit($event)" [merge]="mergeOptions" class="demo-chart" (contextmenu)="onContextMenu2($event)">
+  <div style="visibility: hidden; position: fixed" [style.left]="contextMenuPosition.x"
+    [style.top]="contextMenuPosition.y" [matMenuTriggerFor]="contextMenu">
+  </div>
+</div>
+
+
+<mat-menu #contextMenu="matMenu">
+  
+    <button mat-menu-item (click)="onContextMenuAction1()">Action 1</button>
+    <button mat-menu-item (click)="onContextMenuAction2()">Action 2</button>
+  
+</mat-menu>
