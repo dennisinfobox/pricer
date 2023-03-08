@@ -16,6 +16,8 @@ interface Item {
     styleUrls: ['./price-chart.component.css'],
 })
 export class PriceChartComponent implements OnInit {
+    constructor(private http: HttpClient) {}
+
     items = [
         { id: 1, name: 'Item 1' },
         { id: 2, name: 'Item 2' },
@@ -36,7 +38,6 @@ export class PriceChartComponent implements OnInit {
     contextMenuTop: any;
     contextMenuLeft: any;
     contextMenuVisible: boolean = false;
-    constructor(private http: HttpClient) {}
 
     chartOption: EChartsOption = {
         dataset: {
@@ -44,12 +45,6 @@ export class PriceChartComponent implements OnInit {
         },
         title: {
             text: 'BTC',
-        },
-        tooltip: {
-            trigger: 'axis',
-            axisPointer: {
-                type: 'line',
-            },
         },
         toolbox: {
             feature: {
@@ -300,22 +295,11 @@ export class PriceChartComponent implements OnInit {
     onContextMenu($event: MouseEvent) {
         console.log($event.target);
         //if ($event.target === this.chartElement!.nativeElement) {
-        $event.preventDefault();
+
         this.yCoord = this.echartsInstance.convertFromPixel(
             { seriesIndex: 0 },
             [0, $event.offsetY]
         )[1];
-
-        // set context menu position based on right-click event
-        this.contextMenuVisible = true;
-        this.contextMenuTop = $event.pageY;
-        this.contextMenuLeft = $event.pageX;
-
-        // close context menu if user clicks outside of it
-        document.addEventListener('click', () => {
-            this.contextMenuVisible = false;
-        });
-        //}
     }
 
     createHorizontalLine() {

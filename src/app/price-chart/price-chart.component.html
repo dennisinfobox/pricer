@@ -10,16 +10,14 @@
 </div>
 
 <div  echarts [options]="chartOption" (chartClick)="onChartClick($event)" (click)="onClick($event)"
-  (chartInit)="onChartInit($event)" [merge]="mergeOptions" class="demo-chart" (contextmenu)="onContextMenu2($event)">
-  <div style="visibility: hidden; position: fixed" [style.left]="contextMenuPosition.x"
-    [style.top]="contextMenuPosition.y" [matMenuTriggerFor]="contextMenu">
-  </div>
+  (chartInit)="onChartInit($event)" [merge]="mergeOptions" class="demo-chart" [cdkContextMenuTriggerFor]="context_menu" (contextmenu)="onContextMenu($event)">
+  
 </div>
 
-
-<mat-menu #contextMenu="matMenu">
-  
-    <button mat-menu-item (click)="onContextMenuAction1()">Action 1</button>
-    <button mat-menu-item (click)="onContextMenuAction2()">Action 2</button>
-  
-</mat-menu>
+<ng-template #context_menu>
+  <div class="example-menu" cdkMenu>
+    <button class="example-menu-item" (click)="createHorizontalLine()" cdkMenuItem>create Horizontal Line</button>
+    <button class="example-menu-item" cdkMenuItem>Copy</button>
+    <button class="example-menu-item" cdkMenuItem>Link</button>
+  </div>
+</ng-template>

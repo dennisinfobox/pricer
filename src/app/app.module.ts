@@ -3,11 +3,8 @@ import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
 import { NgxEchartsModule } from 'ngx-echarts';
 import * as echarts from 'echarts';
-import { MatMenuModule } from '@angular/material/menu';
-import { MatButtonModule } from '@angular/material/button';
-import { MatListModule } from '@angular/material/list';
-
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { CdkMenuModule } from '@angular/cdk/menu';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -20,9 +17,7 @@ import { DataService } from './data.service';
         HttpClientModule,
         BrowserModule,
         AppRoutingModule,
-        MatMenuModule,
-        MatButtonModule,
-        MatListModule,
+        CdkMenuModule,
         BrowserAnimationsModule,
         NgxEchartsModule.forRoot({ echarts }),
     ],
